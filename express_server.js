@@ -5,6 +5,12 @@ const PORT = 8080; //default port 8080
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));// activating body parser for POST requests
 
+function generateRandomString() {
+  
+  return Math.random().toString(20).substr(2,6);
+
+}
+
 //set ejs as the engine
 app.set("view engine", "ejs");
 
