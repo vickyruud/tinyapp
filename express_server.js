@@ -3,7 +3,10 @@ const app = express();
 const PORT = 3000; //default port 3000
 
 const bodyParser = require("body-parser");
+const { name } = require('ejs');
 app.use(bodyParser.urlencoded({extended: true}));// activating body parser for POST requests
+const cookieParser = require('cookie-parser');
+app.use(cookieParser());
 
 function generateRandomString() {
 
@@ -27,17 +30,16 @@ app.get('/', (req,res) => {
 
 //takes to the page that shows all the urls
 app.get('/urls', (req,res) => {
-  const templateVars = { urls: urlDatabase}
+  const templateVars = { urls: urlDatabase, username: req.cookies['username']};
   res.render("urls_index", templateVars);
 });
 
-app.get('/hello', (req, res) => {
-  res.send('<html><body> Hello <b>World</b></body></html>\n');
-});
+
 
 //create new url
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  let templateVars = {username: req.cookies['username']};
+  res.render('urls_new', templateVars);
 });
 
 // generate random string and store it
@@ -49,7 +51,7 @@ app.post("/urls", (req, res) => {
 
 //shows the selected urls
 app.get("/urls/:shortURL", (req, res) => {
-  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
+  let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], username: req.cookies['username'] };
   res.render("urls_show", templateVars);
 });
 //takes you to the long URL
@@ -73,6 +75,12 @@ app.post("/urls/:shortURL", (req, res) => {
   
 })
 
+//handle login
+app.post("/login", (req, res) => {
+  res.cookie('username', req.body.username);
+  res.redirect("/urls");
+
+})
 
 
 //log to the console that the server is listening on port 8080.
