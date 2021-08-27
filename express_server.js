@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const PORT = 3000; //setting port
+const PORT = 5000; //setting port
 
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));// activating body parser for POST requests
