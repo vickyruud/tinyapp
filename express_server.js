@@ -73,21 +73,28 @@ app.post("/urls/:shortURL", (req, res) => {
   urlDatabase[shortURL] = req.body.updatedURL
   res.redirect(`/urls/${shortURL}`);
   
-})
+});
 
 //handle login
 app.post("/login", (req, res) => {
   res.cookie('username', req.body.username);
   res.redirect("/urls");
 
-})
+});
 
 //handle logout
 app.post("/logout", (req, res) => {
   res.clearCookie('username', req.body.username);
   res.redirect("/urls");
 
-})
+});
+
+//User registration page
+app.get("/register", (req,res) => {
+  let templateVars = { username: req.cookies['username']};
+  res.render('urls_register', templateVars);
+});
+
 
 //log to the console that the server is listening on port 8080.
 app.listen(PORT, () => {
