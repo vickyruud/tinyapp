@@ -17,15 +17,17 @@ function generateRandomString() {
 
 }
 
-//check if email already exists
-const checkIfEmailExists = (email) =>{
-  for (const user in users) {
-    if (users[user].email === email) {
-      return true;
+//check if email already exists in database
+const checkIfEmailExistsInDatabase = (email, database) =>{
+  for (const user in database) {
+    if (database[user].email === email) {
+      return database[user];
     }
   }
-  return false;
+  return undefined;
 };
+
+//declare empty object users
 const users = {};
 
 //set ejs as the engine
@@ -98,14 +100,25 @@ app.get('/login', (req, res) => {
 
 //handle login
 app.post("/login", (req, res) => {
-  res.cookie('username', req.body.username);
-  res.redirect("/urls");
-
+  const user = checkIfEmailExistsInDatabase(req.body.email, users);
+  if (user) {
+   if (req.body.password == user.password) {
+    res.cookie("user_id", user.userID);
+    res.cookie("password", user.password);
+    res.redirect('/urls');
+   } else {
+    res.statusCode = 400;
+    res.send('<h3>403 Forbidden Request!<br> Incorrect Password<h3>');
+   }
+   } else {
+    res.statusCode = 400;
+    res.send('<h3>403 Forbidden Request!<br> User does not exist<h3>');
+   }  
 });
 
 //handle logout
 app.post('/logout', (req, res) => {
-  res.clearCookie('user_id', 'password');
+  res.clearCookie('user_id');
   res.redirect('/urls');
 })
 
@@ -117,19 +130,17 @@ app.get('/register', (req, res) => {
 
 //registration handler
 app.post("/register", (req,res) => {
- console.log(req.body.email)
-  
   if(req.body.email && req.body.password) {
-    if (!checkIfEmailExists(req.body.email)) {
-      let userID = generateRandomString();
+    if (!checkIfEmailExistsInDatabase(req.body.email, users)) {
+      const userID = generateRandomString();
       users[userID] = {
       userID,
       email: req.body.email,
       password: req.body.password
       }
-      res.cookie("user_id", userID);
-      res.cookie("password", users[userID].password);
-      res.redirect('/urls');
+      // res.cookie("user_id", userID);
+      // res.cookie("password", users[userID].password);
+      res.redirect('/login');
     } else {
       res.statusCode = 400
       res.send(`<h3>400 Bad Request,<br> Email already exists</h3>`);
