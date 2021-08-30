@@ -14,6 +14,8 @@ function generateRandomString() {
 
 }
 
+const users = {};
+
 //set ejs as the engine
 app.set("view engine", "ejs");
 
@@ -30,7 +32,7 @@ app.get('/', (req,res) => {
 
 //takes to the page that shows all the urls
 app.get('/urls', (req,res) => {
-  const templateVars = { urls: urlDatabase, username: req.cookies['username']};
+  const templateVars = {urls : urlDatabase, user: users[req.cookies['user_id']]}
   res.render("urls_index", templateVars);
 });
 
@@ -38,7 +40,7 @@ app.get('/urls', (req,res) => {
 
 //create new url
 app.get("/urls/new", (req, res) => {
-  let templateVars = {username: req.cookies['username']};
+  let templateVars = {user: users[req.cookies['user_id']]};
   res.render('urls_new', templateVars);
 });
 
@@ -51,7 +53,7 @@ app.post("/urls", (req, res) => {
 
 //shows the selected urls
 app.get("/urls/:shortURL", (req, res) => {
-  let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], username: req.cookies['username'] };
+  let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], user: users[req.cookies]['user_id'] };
   res.render("urls_show", templateVars);
 });
 //takes you to the long URL
@@ -90,9 +92,22 @@ app.post("/logout", (req, res) => {
 });
 
 //User registration page
-app.get("/register", (req,res) => {
-  let templateVars = { username: req.cookies['username']};
+app.get('/register', (req, res) => {
+  let templateVars = {user: users[req.cookies['username']]};
   res.render('urls_register', templateVars);
+});
+
+//registration handler
+app.post("/register", (req,res) => {
+  let userID = generateRandomString();
+  users[userID] = {
+    userID,
+    email: req.body.email,
+    password: req.body.password
+  }
+  res.cookie("user_id", userID);
+  res.cookie("password", users[userID].password);
+  res.redirect('/urls');
 });
 
 
