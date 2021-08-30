@@ -27,6 +27,15 @@ const checkIfEmailExistsInDatabase = (email, database) =>{
   return undefined;
 };
 
+const urlsForUser = (id) => {
+  for (url in urlDatabase ) {
+    if (urlDatabase[url].userID === id) {
+      return true;
+    }
+  }
+  return false;
+}
+
 //declare empty object users
 const users = {};
 
@@ -35,13 +44,14 @@ app.set("view engine", "ejs");
 
 // stroring the shortened links in an object
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID : "asd3f4"},
+  "9sm5xK": {longURL: "http://www.google.com", userID: "l2k3j4"}
 };
 
 //on the get command send hello
 app.get('/', (req,res) => {
-  res.send("Hello!");
+  const templateVars = {urls : urlDatabase, user: users[req.cookies['user_id']]}
+  res.render("urls_home", templateVars);
 });
 
 //takes to the page that shows all the urls
@@ -54,8 +64,12 @@ app.get('/urls', (req,res) => {
 
 //create new url
 app.get("/urls/new", (req, res) => {
-  let templateVars = {user: users[req.cookies['user_id']]};
-  res.render('urls_new', templateVars);
+  if (req.cookies['user_id']) {
+    let templateVars = {user: users[req.cookies['user_id']]};
+    res.render('urls_new', templateVars);
+  } else {
+    res.redirect('/login')
+  }
 });
 
 // generate random string and store it
@@ -67,7 +81,7 @@ app.post("/urls", (req, res) => {
 
 //shows the selected urls
 app.get("/urls/:shortURL", (req, res) => {
-  let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], user: users[req.cookies]['user_id'] };
+  let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL, user: users[req.cookies['user_id']] };
   res.render("urls_show", templateVars);
 });
 //takes you to the long URL
