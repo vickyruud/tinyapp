@@ -8,12 +8,24 @@ app.use(bodyParser.urlencoded({extended: true}));// activating body parser for P
 const cookieParser = require('cookie-parser');
 app.use(cookieParser());
 
+
+
+//generate random 6 character string 
 function generateRandomString() {
 
   return Math.random().toString(20).substr(2,6);
 
 }
 
+//check if email already exists
+const checkIfEmailExists = (email) =>{
+  for (const user in users) {
+    if (users[user].email === email) {
+      return true;
+    }
+  }
+  return false;
+};
 const users = {};
 
 //set ejs as the engine
@@ -85,11 +97,10 @@ app.post("/login", (req, res) => {
 });
 
 //handle logout
-app.post("/logout", (req, res) => {
-  res.clearCookie('username', req.body.username);
-  res.redirect("/urls");
-
-});
+app.post('/logout', (req, res) => {
+  res.clearCookie('user_id', 'password');
+  res.redirect('/urls');
+})
 
 //User registration page
 app.get('/register', (req, res) => {
@@ -99,15 +110,27 @@ app.get('/register', (req, res) => {
 
 //registration handler
 app.post("/register", (req,res) => {
-  let userID = generateRandomString();
-  users[userID] = {
-    userID,
-    email: req.body.email,
-    password: req.body.password
+ console.log(req.body.email)
+  
+  if(req.body.email && req.body.password) {
+    if (!checkIfEmailExists(req.body.email)) {
+      let userID = generateRandomString();
+      users[userID] = {
+      userID,
+      email: req.body.email,
+      password: req.body.password
+      }
+      res.cookie("user_id", userID);
+      res.cookie("password", users[userID].password);
+      res.redirect('/urls');
+    } else {
+      res.statusCode = 400
+      res.send(`<h3>400 Bad Request,<br> Email already exists</h3>`);
+    }
+  } else {
+    res.send(`<h3>400 Bad Request,<br> Email and Password should be competed!</h3>`);
   }
-  res.cookie("user_id", userID);
-  res.cookie("password", users[userID].password);
-  res.redirect('/urls');
+  console.log(users);
 });
 
 
