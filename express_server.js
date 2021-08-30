@@ -27,6 +27,7 @@ const checkIfEmailExistsInDatabase = (email, database) =>{
   return undefined;
 };
 
+//check urls for each user
 const urlsForUser = (id) => {
   for (url in urlDatabase ) {
     if (urlDatabase[url].userID === id) {
@@ -35,6 +36,7 @@ const urlsForUser = (id) => {
   }
   return false;
 }
+
 
 //declare empty object users
 const users = {};
@@ -65,7 +67,7 @@ app.get('/urls', (req,res) => {
 //create new url
 app.get("/urls/new", (req, res) => {
   if (req.cookies['user_id']) {
-    let templateVars = {user: users[req.cookies['user_id']]};
+    const templateVars = {user: users[req.cookies['user_id']]};
     res.render('urls_new', templateVars);
   } else {
     res.redirect('/login')
@@ -81,7 +83,7 @@ app.post("/urls", (req, res) => {
 
 //shows the selected urls
 app.get("/urls/:shortURL", (req, res) => {
-  let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL, user: users[req.cookies['user_id']] };
+  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL, user: users[req.cookies['user_id']] };
   res.render("urls_show", templateVars);
 });
 //takes you to the long URL
@@ -107,7 +109,7 @@ app.post("/urls/:shortURL", (req, res) => {
 
 //login page
 app.get('/login', (req, res) => {
-  let templateVars = {user: users[req.cookies['user_id']]};
+  const templateVars = {user: users[req.cookies['user_id']]};
   res.render('urls_login', templateVars);
 
 });
@@ -138,7 +140,7 @@ app.post('/logout', (req, res) => {
 
 //User registration page
 app.get('/register', (req, res) => {
-  let templateVars = {user: users[req.cookies['user_id']]};
+  const templateVars = {user: users[req.cookies['user_id']]};
   res.render('urls_register', templateVars);
 });
 
