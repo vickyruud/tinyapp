@@ -128,7 +128,7 @@ app.get('/register', (req, res) => {
   res.render('urls_register', templateVars);
 });
 
-//registration handler
+//registration handler that creates the user and redirects to the login page so that the user can login.
 app.post("/register", (req,res) => {
   if(req.body.email && req.body.password) {
     if (!checkIfEmailExistsInDatabase(req.body.email, users)) {
@@ -138,9 +138,7 @@ app.post("/register", (req,res) => {
       email: req.body.email,
       password: req.body.password
       }
-      // res.cookie("user_id", userID);
-      // res.cookie("password", users[userID].password);
-      res.redirect('/login');
+    res.redirect('/login');
     } else {
       res.statusCode = 400
       res.send(`<h3>400 Bad Request,<br> Email already exists</h3>`);
