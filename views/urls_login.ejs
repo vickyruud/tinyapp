@@ -6,19 +6,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
-  <title>Registration Page</title>
+  <title>Login Page</title>
 </head>
 <body>
   <%- include('partials/_header') %>
   <main style="margin: 1em;"></main>
-  <h4>New Account</h4>
-    <form action="/register"   method="POST">
+  <h4>Login</h4>
+    <form action="/login"   method="POST">
       <div class="form-inline mb-2">
-        <label for="email">Email</label>
+        <label for="email">Email Address</label>
         <input class="form-control mb-3" type="email" name="email" placeholder="Email Address" style="width: 200px">
         <label for="password">Password</label>
         <input class="form-control mb-3" type="password" name="password" placeholder="Password" style="width: 150px">
-        <button type="submit" class="btn btn-primary">Sign Up</button>
+        <button type="submit" class="btn btn-primary">Login</button>
         </div>
       </form>
       <!-- Bootstrap JS -->
