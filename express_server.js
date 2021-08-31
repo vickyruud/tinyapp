@@ -23,7 +23,7 @@ function generateRandomString() {
 }
 
 //check if email already exists in database
-const checkIfEmailExistsInDatabase = (email, database) =>{
+const authenticateUser = (email, database) =>{
   for (const user in database) {
     if (database[user].email === email) {
       return database[user];
@@ -137,7 +137,7 @@ app.get('/login', (req, res) => {
 
 //handle login
 app.post("/login", (req, res) => {
-  const user = checkIfEmailExistsInDatabase(req.body.email, users);
+  const user = authenticateUser(req.body.email, users);
   if (user) {
    if (bcrypt.compareSync(req.body.password, user.password)) {
     req.session.user_id = user.userID;
@@ -152,12 +152,12 @@ app.post("/login", (req, res) => {
    }  
 });
 
-//handle logout
+//handle logout, clear cookies and return to homepage
 app.post('/logout', (req, res) => {
   res.clearCookie('session');
   res.clearCookie('session.sig');
   res.clearCookie('password');
-  res.redirect('/urls');
+  res.redirect('/');
 })
 
 //User registration page
@@ -169,7 +169,7 @@ app.get('/register', (req, res) => {
 //registration handler that creates the user and redirects to the login page so that the user can login.
 app.post("/register", (req,res) => {
   if(req.body.email && req.body.password) {
-    if (!checkIfEmailExistsInDatabase(req.body.email, users)) {
+    if (!authenticateUser(req.body.email, users)) {
       const userID = generateRandomString();
       const password = bcrypt.hashSync(req.body.password, 10);
       users[userID] = {
