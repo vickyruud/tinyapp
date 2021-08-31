@@ -1,6 +1,8 @@
 const express = require('express');
 const app = express();
 const PORT = 5000; //setting port
+const bcrypt = require('bcrypt');
+
 
 const bodyParser = require("body-parser");
 const { name } = require('ejs');
@@ -134,7 +136,7 @@ app.get('/login', (req, res) => {
 app.post("/login", (req, res) => {
   const user = checkIfEmailExistsInDatabase(req.body.email, users);
   if (user) {
-   if (req.body.password == user.password) {
+   if (bcrypt.compareSync(req.body.password, user.password)) {
     res.cookie("user_id", user.userID);
     res.cookie("password", user.password);
     res.redirect('/urls');
@@ -165,10 +167,11 @@ app.post("/register", (req,res) => {
   if(req.body.email && req.body.password) {
     if (!checkIfEmailExistsInDatabase(req.body.email, users)) {
       const userID = generateRandomString();
+      const password = bcrypt.hashSync(req.body.password, 10);
       users[userID] = {
       userID,
       email: req.body.email,
-      password: req.body.password
+      password: password
       }
     res.redirect('/login');
     } else {
