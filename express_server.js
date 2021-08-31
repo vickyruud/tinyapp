@@ -29,12 +29,14 @@ const checkIfEmailExistsInDatabase = (email, database) =>{
 
 //check urls for each user
 const urlsForUser = (id) => {
+  let userUrls = {};
+
   for (url in urlDatabase ) {
     if (urlDatabase[url].userID === id) {
-      return true;
+      userUrls[url] = urlDatabase[url];
     }
   }
-  return false;
+  return userUrls;
 }
 
 
@@ -58,15 +60,10 @@ app.get('/', (req,res) => {
 
 //takes to the page that shows all the urls
 app.get('/urls', (req,res) => {
-  const templateVars = {urls : urlDatabase, user: users[req.cookies['user_id']]}
-  for (user in users) {
-    for (url in urlDatabase) {
-      if(users[user].userID === urlDatabase[url].userID){
-        console.log("it works!");
-      }
-
-    }
-  }
+  const userID = req.cookies['user_id'];
+  const userUrls = urlsForUser(userID);
+  const templateVars = {urls : userUrls, user: users[userID]}
+  
   res.render("urls_index", templateVars);
 });
 
@@ -74,9 +71,12 @@ app.get('/urls', (req,res) => {
 
 //create new url
 app.get("/urls/new", (req, res) => {
-    const templateVars = {user: users[req.cookies['user_id']]};
+  if (req.cookies['user_id']) {
+    let templateVars = {user: users[req.cookies['user_id']]};
     res.render('urls_new', templateVars);
-    res.redirect('/login')
+  } else {
+    res.redirect('/login');
+  }
 });
   
 
@@ -85,14 +85,16 @@ app.post("/urls", (req, res) => {
   const shortURL = generateRandomString()
   urlDatabase[shortURL] = {
     longURL: req.body.longURL,
-    userID: req.body.userID
+    userID: req.cookies['user_id']
   };
   res.redirect(`/urls/${shortURL}`);
 })
 
 //shows the selected urls
 app.get("/urls/:shortURL", (req, res) => {
-  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL, user: users[req.cookies['user_id']] };
+  const userID = req.cookies['user_id'];
+  const userUrls = urlsForUser(userID);
+  const templateVars = { urls: userUrls, user: users[userID], shortURL:req.params.shortURL }
   res.render("urls_show", templateVars);
 });
 //takes you to the long URL
@@ -101,17 +103,22 @@ app.get("/u/:shortURL" , (req, res) => {
   res.redirect(longURL);
 });
 
-//deletes URL
+//deletes URL only if the url belongs to the logged in user
 app.post("/urls/:shortURL/delete", (req, res) => {
-  delete urlDatabase[req.params.shortURL];
+  const shortURL = req.params.shortURL;
+  if (req.cookies['user_id'] === urlDatabase[shortURL].userID) {
+    delete urlDatabase[shortURL];
+  } 
   res.redirect("/urls");
   
 });
 
-//editing URL
+//editing URL only if URL belongs to the logged in user
 app.post("/urls/:shortURL", (req, res) => {
   const shortURL =  req.params.shortURL;
-  urlDatabase[shortURL] = req.body.updatedURL
+  if (req.cookies['user_id'] == urlDatabase[shortURL].userID) {
+    urlDatabase[shortURL].longURL = req.body.updatedURL;
+  }
   res.redirect(`/urls/${shortURL}`);
   
 });
