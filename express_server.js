@@ -59,6 +59,14 @@ app.get('/', (req,res) => {
 //takes to the page that shows all the urls
 app.get('/urls', (req,res) => {
   const templateVars = {urls : urlDatabase, user: users[req.cookies['user_id']]}
+  for (user in users) {
+    for (url in urlDatabase) {
+      if(users[user].userID === urlDatabase[url].userID){
+        console.log("it works!");
+      }
+
+    }
+  }
   res.render("urls_index", templateVars);
 });
 
@@ -66,18 +74,19 @@ app.get('/urls', (req,res) => {
 
 //create new url
 app.get("/urls/new", (req, res) => {
-  if (req.cookies['user_id']) {
     const templateVars = {user: users[req.cookies['user_id']]};
     res.render('urls_new', templateVars);
-  } else {
     res.redirect('/login')
-  }
 });
+  
 
 // generate random string and store it
 app.post("/urls", (req, res) => {
   const shortURL = generateRandomString()
-  urlDatabase[shortURL] = req.body.longURL;
+  urlDatabase[shortURL] = {
+    longURL: req.body.longURL,
+    userID: req.body.userID
+  };
   res.redirect(`/urls/${shortURL}`);
 })
 
@@ -88,7 +97,7 @@ app.get("/urls/:shortURL", (req, res) => {
 });
 //takes you to the long URL
 app.get("/u/:shortURL" , (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL];
+  const longURL = urlDatabase[req.params.shortURL].longURL;
   res.redirect(longURL);
 });
 
@@ -168,5 +177,5 @@ app.post("/register", (req,res) => {
 
 //log to the console that the server is listening on port 8080.
 app.listen(PORT, () => {
-  console.log(`Example app is listening on port: ${PORT}`);
+  console.log(`TinyApp URL shortener is listening on port: ${PORT}`);
 });
