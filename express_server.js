@@ -8,6 +8,7 @@ app.use(cookieSession({
   secret: 'rooney-ruud-scholes-keane'
 }));
 
+const authenticateUser = require('./helpers');
 
 const bodyParser = require("body-parser");
 const { name } = require('ejs');
@@ -22,15 +23,7 @@ function generateRandomString() {
 
 }
 
-//check if email already exists in database
-const authenticateUser = (email, database) =>{
-  for (const user in database) {
-    if (database[user].email === email) {
-      return database[user];
-    }
-  }
-  return undefined;
-};
+
 
 //check urls for each user
 const urlsForUser = (id) => {
@@ -166,7 +159,7 @@ app.get('/register', (req, res) => {
   res.render('urls_register', templateVars);
 });
 
-//registration handler that creates the user and redirects to the login page so that the user can login.
+//registration handler that creates the user and logs them into the site.
 app.post("/register", (req,res) => {
   if(req.body.email && req.body.password) {
     if (!authenticateUser(req.body.email, users)) {
@@ -186,7 +179,6 @@ app.post("/register", (req,res) => {
   } else {
     res.send(`<h3>400 Bad Request,<br> Email and Password should be competed!</h3>`);
   }
-  console.log(users);
 });
 
 
