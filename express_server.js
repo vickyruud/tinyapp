@@ -8,12 +8,12 @@ app.use(cookieSession({
   secret: 'rooney-ruud-scholes-keane'
 }));
 
-const getUserByEmail = require('./helpers');
+const { getUserByEmail }  = require('./helpers');
+
 
 const bodyParser = require("body-parser");
 const { name } = require('ejs');
 app.use(bodyParser.urlencoded({extended: true}));// activating body parser for POST requests
-
 
 
 //generate random 6 character string 
@@ -22,8 +22,6 @@ function generateRandomString() {
   return Math.random().toString(20).substr(2,6);
 
 }
-
-
 
 //check urls for each user
 const urlsForUser = (id) => {
@@ -38,6 +36,8 @@ const urlsForUser = (id) => {
 }
 
 
+
+
 //declare empty object users
 const users = {};
 
@@ -45,10 +45,7 @@ const users = {};
 app.set("view engine", "ejs");
 
 // stroring the shortened links in an object
-const urlDatabase = {
-  "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID : "asd3f4"},
-  "9sm5xK": {longURL: "http://www.google.com", userID: "l2k3j4"}
-};
+const urlDatabase = {};
 
 //on the get command send hello
 app.get('/', (req,res) => {

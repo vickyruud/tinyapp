@@ -8,5 +8,18 @@ const getUserByEmail = (email, database) =>{
   return undefined;
 };
 
+//check urls for each user
+const urlsForUser = (id) => {
+  let userUrls = {};
 
-module.exports = getUserByEmail;
+  for (url in urlDatabase ) {
+    if (urlDatabase[url].userID === id) {
+      userUrls[url] = urlDatabase[url];
+    }
+  }
+  return userUrls;
+}
+
+module.exports = { 
+  getUserByEmail,
+  urlsForUser};
