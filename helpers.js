@@ -8,17 +8,18 @@ const getUserByEmail = (email, database) =>{
   return undefined;
 };
 
-//check urls for each user
-const urlsForUser = (id) => {
+//check and retrieve urls for each user
+const urlsForUser = (id, database) => {
   let userUrls = {};
 
-  for (url in urlDatabase ) {
-    if (urlDatabase[url].userID === id) {
-      userUrls[url] = urlDatabase[url];
+  for (url in database ) {
+    if (database[url].userID === id) {
+      userUrls[url] = database[url];
     }
   }
   return userUrls;
 }
+
 
 module.exports = { 
   getUserByEmail,

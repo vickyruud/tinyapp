@@ -8,7 +8,7 @@ app.use(cookieSession({
   secret: 'rooney-ruud-scholes-keane'
 }));
 
-const { getUserByEmail }  = require('./helpers');
+const { getUserByEmail, urlsForUser }  = require('./helpers');
 
 
 const bodyParser = require("body-parser");
@@ -23,17 +23,6 @@ function generateRandomString() {
 
 }
 
-//check and retrieve urls for each user
-const urlsForUser = (id) => {
-  let userUrls = {};
-
-  for (url in urlDatabase ) {
-    if (urlDatabase[url].userID === id) {
-      userUrls[url] = urlDatabase[url];
-    }
-  }
-  return userUrls;
-}
 
 
 
@@ -56,7 +45,7 @@ app.get('/', (req,res) => {
 //takes to the page that shows all the urls
 app.get('/urls', (req,res) => {
   const userID = req.session.user_id;
-  const userUrls = urlsForUser(userID);
+  const userUrls = urlsForUser(userID, urlDatabase);
   const templateVars = {urls : userUrls, user: users[userID]}
   
   res.render("urls_index", templateVars);
@@ -88,7 +77,7 @@ app.post("/urls", (req, res) => {
 //shows the selected urls
 app.get("/urls/:shortURL", (req, res) => {
   const userID = req.session.user_id;
-  const userUrls = urlsForUser(userID);
+  const userUrls = urlsForUser(userID, urlDatabase);
   const templateVars = { urls: userUrls, user: users[userID], shortURL:req.params.shortURL }
   res.render("urls_show", templateVars);
 });
