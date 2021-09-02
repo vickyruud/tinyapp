@@ -23,7 +23,7 @@ function generateRandomString() {
 
 }
 
-//check urls for each user
+//check and retrieve urls for each user
 const urlsForUser = (id) => {
   let userUrls = {};
 
