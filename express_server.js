@@ -8,7 +8,7 @@ app.use(cookieSession({
   secret: 'rooney-ruud-scholes-keane'
 }));
 
-const authenticateUser = require('./helpers');
+const getUserByEmail = require('./helpers');
 
 const bodyParser = require("body-parser");
 const { name } = require('ejs');
@@ -130,7 +130,7 @@ app.get('/login', (req, res) => {
 
 //handle login
 app.post("/login", (req, res) => {
-  const user = authenticateUser(req.body.email, users);
+  const user = getUserByEmail(req.body.email, users);
   if (user) {
    if (bcrypt.compareSync(req.body.password, user.password)) {
     req.session.user_id = user.userID;
@@ -147,9 +147,7 @@ app.post("/login", (req, res) => {
 
 //handle logout, clear cookies and return to homepage
 app.post('/logout', (req, res) => {
-  res.clearCookie('session');
-  res.clearCookie('session.sig');
-  res.clearCookie('password');
+  req.session = null;
   res.redirect('/');
 })
 
@@ -162,7 +160,7 @@ app.get('/register', (req, res) => {
 //registration handler that creates the user and logs them into the site.
 app.post("/register", (req,res) => {
   if(req.body.email && req.body.password) {
-    if (!authenticateUser(req.body.email, users)) {
+    if (!getUserByEmail(req.body.email, users)) {
       const userID = generateRandomString();
       const password = bcrypt.hashSync(req.body.password, 10);
       users[userID] = {
