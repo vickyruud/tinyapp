@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const PORT = 5000; //setting port
 const bcrypt = require('bcrypt');
-const cookieSession = require('cookie-session')
+const cookieSession = require('cookie-session');
 app.use(cookieSession({
   name: 'session',
   secret: 'rooney-ruud-scholes-keane'
@@ -12,16 +12,15 @@ const { getUserByEmail, urlsForUser }  = require('./helpers');
 
 
 const bodyParser = require("body-parser");
-const { name } = require('ejs');
 app.use(bodyParser.urlencoded({extended: true}));// activating body parser for POST requests
 
 
-//generate random 6 character string 
-function generateRandomString() {
+//generate random 6 character string
+const generateRandomString = () => {
 
   return Math.random().toString(20).substr(2,6);
 
-}
+};
 
 
 
@@ -38,7 +37,7 @@ const urlDatabase = {};
 
 //on the get command send hello
 app.get('/', (req,res) => {
-  const templateVars = {urls : urlDatabase, user: users[req.session.user_id]}
+  const templateVars = {urls : urlDatabase, user: users[req.session.user_id]};
   res.render("urls_home", templateVars);
 });
 
@@ -46,7 +45,7 @@ app.get('/', (req,res) => {
 app.get('/urls', (req,res) => {
   const userID = req.session.user_id;
   const userUrls = urlsForUser(userID, urlDatabase);
-  const templateVars = {urls : userUrls, user: users[userID]}
+  const templateVars = {urls : userUrls, user: users[userID]};
   
   res.render("urls_index", templateVars);
 });
@@ -66,19 +65,19 @@ app.get("/urls/new", (req, res) => {
 
 // generate random string and store it
 app.post("/urls", (req, res) => {
-  const shortURL = generateRandomString()
+  const shortURL = generateRandomString();
   urlDatabase[shortURL] = {
     longURL: req.body.longURL,
     userID: req.session.user_id
   };
   res.redirect(`/urls/${shortURL}`);
-})
+});
 
 //shows the selected urls
 app.get("/urls/:shortURL", (req, res) => {
   const userID = req.session.user_id;
   const userUrls = urlsForUser(userID, urlDatabase);
-  const templateVars = { urls: userUrls, user: users[userID], shortURL:req.params.shortURL }
+  const templateVars = { urls: userUrls, user: users[userID], shortURL:req.params.shortURL };
   res.render("urls_show", templateVars);
 });
 //takes you to the long URL
@@ -97,10 +96,10 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   
 });
 
-//editing URL only if URL belongs to the logged in user
+//edit URL only if URL belongs to the logged in user
 app.post("/urls/:shortURL", (req, res) => {
   const shortURL =  req.params.shortURL;
-  if (req.session.user_id == urlDatabase[shortURL].userID) {
+  if (req.session.user_id === urlDatabase[shortURL].userID) {
     urlDatabase[shortURL].longURL = req.body.updatedURL;
   }
   res.redirect(`/urls/${shortURL}`);
@@ -118,24 +117,24 @@ app.get('/login', (req, res) => {
 app.post("/login", (req, res) => {
   const user = getUserByEmail(req.body.email, users);
   if (user) {
-   if (bcrypt.compareSync(req.body.password, user.password)) {
-    req.session.user_id = user.userID;
-    res.redirect('/urls');
-   } else {
-    res.statusCode = 400;
-    res.send('<h3>403 Forbidden Request!<br> Incorrect Password<h3>');
-   }
-   } else {
+    if (bcrypt.compareSync(req.body.password, user.password)) {
+      req.session.user_id = user.userID;
+      res.redirect('/urls');
+    } else {
+      res.statusCode = 400;
+      res.send('<h3>403 Forbidden Request!<br> Incorrect Password<h3>');
+    }
+  } else {
     res.statusCode = 400;
     res.send('<h3>403 Forbidden Request!<br> User does not exist<h3>');
-   }  
+  }
 });
 
 //handle logout, clear cookies and return to homepage
 app.post('/logout', (req, res) => {
   req.session = null;
   res.redirect('/');
-})
+});
 
 //User registration page
 app.get('/register', (req, res) => {
@@ -145,19 +144,19 @@ app.get('/register', (req, res) => {
 
 //registration handler that creates the user and logs them into the site.
 app.post("/register", (req,res) => {
-  if(req.body.email && req.body.password) {
+  if (req.body.email && req.body.password) {
     if (!getUserByEmail(req.body.email, users)) {
       const userID = generateRandomString();
       const password = bcrypt.hashSync(req.body.password, 10);
       users[userID] = {
-      userID,
-      email: req.body.email,
-      password: password
-      }
-    req.session.user_id = userID;
-    res.redirect('/urls');
+        userID,
+        email: req.body.email,
+        password: password
+      };
+      req.session.user_id = userID;
+      res.redirect('/urls');
     } else {
-      res.statusCode = 400
+      res.statusCode = 400;
       res.send(`<h3>400 Bad Request,<br> Email already exists</h3>`);
     }
   } else {
