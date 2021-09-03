@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const PORT = 5000; //setting port
+const PORT = process.env.PORT || 8080; //setting port
 const bcrypt = require('bcrypt');
 const cookieSession = require('cookie-session');
 app.use(cookieSession({
@@ -8,7 +8,7 @@ app.use(cookieSession({
   secret: 'rooney-ruud-scholes-keane'
 }));
 
-const { getUserByEmail, urlsForUser }  = require('./helpers');
+const { getUserByEmail, urlsForUser }  = require('./helpers'); // importing helper functions 
 
 
 const bodyParser = require("body-parser");
