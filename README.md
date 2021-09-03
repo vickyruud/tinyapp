@@ -1,7 +1,5 @@
 # TinyApp Project
 
-This application helps to shorten any given URL.
-
 TinyApp is a full stack web application built with Node and Express that allows users to shorten long URLs (à la bit.ly).
 
 ## Final Product
@@ -25,3 +23,25 @@ TinyApp is a full stack web application built with Node and Express that allows 
 
 - Install all dependencies (using the `npm install` command).
 - Run the development web server using the `node express_server.js` command.
+- Go to localhost:8080 on your browser and start shortening your URLs.
+
+## Using TinyApp
+
+### Register/Login
+You must login to create, view, edit or delete links.
+If you have not created an account yet, please click on register to create a new account. On the registration page, enter your email address and password. You will then be automatically logged into the website.
+
+### Create new links
+Click on the Create New URL link on the top of the page. You will then have to enter the complete url that you would like to shorten. This will create a short URL and store it under the My URLs page.
+
+### Editing or Deleting URLs
+You can edit exiting links or delete them from the My URLs page. Simply click on the delete button next to the the desired URL and it will be deleted.
+
+Clicking on the edit button will take you to the edit page where you can enter a new long URL to relpace the existing one. This will use the same short URL link to access the new long URL.
+
+### Using the Short URL
+
+The path to use any short link is localhost:8080/u/:shortURL. This will take you directly to the long URL associated with the particular short URL.
+
+### Logout
+Once you are done, click on the logout button to logout.
